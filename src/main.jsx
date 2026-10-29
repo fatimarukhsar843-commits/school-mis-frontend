@@ -1,5 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import "./apiBase"
+import "./apiSetup"
 import "./apiSetup"
 import App from './App.jsx'
 import './index.css'
