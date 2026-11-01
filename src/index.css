@@ -27,3 +27,7 @@
     page-break-after: auto;
   }
 }
+/* Phones: let wide tables scroll sideways instead of being cut off */
+.overflow-hidden:has(> table) {
+  overflow-x: auto;
+}

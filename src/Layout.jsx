@@ -60,6 +60,7 @@ function Layout() {
   const [showLogoPreview, setShowLogoPreview] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [isClassTeacher, setIsClassTeacher] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false) // phone menu
   const accountRef = useRef(null)
 
   // For teachers: find out if they are a class teacher
@@ -86,6 +87,7 @@ function Layout() {
 
   function handleLogout() {
     setShowProfile(false)
+    setMenuOpen(false)
     logout()
     navigate("/login")
   }
@@ -106,23 +108,33 @@ function Layout() {
   const initial = user?.name?.[0]?.toUpperCase() || "?"
 
   return (
-    <div className="flex min-h-screen relative">
+    <div className="flex min-h-screen relative overflow-x-hidden">
       {/* Watermark — fixed to the whole viewport, behind everything */}
       <div className="pointer-events-none select-none fixed inset-0 flex items-center justify-center opacity-[0.05] z-0">
         {branding.logoUrl ? (
           <img
             src={branding.logoUrl}
             alt=""
-            className="w-[40rem] h-[40rem] object-contain"
+            className="w-[40rem] h-[40rem] max-w-[90vw] max-h-[90vw] object-contain"
           />
         ) : (
-          <LogoIcon className="w-[40rem] h-[40rem]" />
+          <LogoIcon className="w-[40rem] h-[40rem] max-w-[90vw] max-h-[90vw]" />
         )}
       </div>
 
-      {/* Sidebar */}
+      {/* Dark layer behind the sidebar on phones (tap it to close the menu) */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setMenuOpen(false)}
+        ></div>
+      )}
+
+      {/* Sidebar: slides in on phones, always visible on bigger screens */}
       <aside
-        className="w-64 text-white flex flex-col relative z-10"
+        className={`w-64 text-white flex flex-col z-40 fixed inset-y-0 left-0 transform transition-transform duration-200 md:static md:translate-x-0 md:z-10 md:flex-shrink-0 ${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
         style={{ backgroundColor: branding.sidebarColor }}
       >
         <button
@@ -146,6 +158,7 @@ function Layout() {
             <Link
               key={item.path}
               to={item.path}
+              onClick={() => setMenuOpen(false)}
               className="block px-3 py-2 rounded hover:bg-white/10"
             >
               {item.label}
@@ -181,7 +194,7 @@ function Layout() {
               <div className="border-t p-2 flex flex-col">
                 <Link
                   to={`/${user?.role}/profile`}
-                  onClick={() => setShowProfile(false)}
+                  onClick={() => { setShowProfile(false); setMenuOpen(false) }}
                   className="px-3 py-2 rounded hover:bg-gray-100 text-sm"
                 >
                   My Profile (edit name / password)
@@ -212,16 +225,26 @@ function Layout() {
       </aside>
 
       {/* Main area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Navbar */}
-        <header className="h-16 bg-white shadow flex items-center px-6 relative z-10">
-          <span className="text-gray-700">
+        <header className="h-16 bg-white shadow flex items-center gap-3 px-3 md:px-6 relative z-10">
+          {/* Menu button: only on phones */}
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="md:hidden p-2 rounded hover:bg-gray-100"
+            aria-label="Open menu"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <span className="text-gray-700 truncate">
             Welcome, {user?.name}
           </span>
         </header>
 
         {/* Page content renders here */}
-        <main className="flex-1 p-6 relative z-10">
+        <main className="flex-1 p-3 md:p-6 relative z-10 min-w-0 overflow-x-auto">
           <Outlet />
         </main>
       </div>
