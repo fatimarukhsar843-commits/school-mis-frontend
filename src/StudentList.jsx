@@ -10,6 +10,7 @@ function StudentList() {
   const [showForm, setShowForm] = useState(false)
   const [editingStudent, setEditingStudent] = useState(null)
   const [classFilter, setClassFilter] = useState("All")
+  const [search, setSearch] = useState("")
 
   async function refresh() {
     const data = await getStudents()
@@ -23,7 +24,7 @@ function StudentList() {
   const classOrder = getClassList()
 
   // Filter by class, then sort by class and roll number
-  const visibleStudents = (
+  const classStudents = (
     classFilter === "All"
       ? students
       : students.filter((s) => s.className === classFilter)
@@ -34,6 +35,19 @@ function StudentList() {
       if (byClass !== 0) return byClass
       return (parseInt(a.rollNo, 10) || 0) - (parseInt(b.rollNo, 10) || 0)
     })
+
+  // Search by student name and father's name. Capital or small letters don't matter,
+  // and every word typed must be found (e.g. "ali ahmed" = student Ali, father Ahmed).
+  const words = search.toLowerCase().split(/\s+/).filter(Boolean)
+  const visibleStudents =
+    words.length === 0
+      ? classStudents
+      : classStudents.filter((s) => {
+          const text = `${s.name || ""} ${s.guardian || ""}`.toLowerCase()
+          return words.every((w) => text.includes(w))
+        })
+
+  const isFiltering = words.length > 0 || classFilter !== "All"
 
   function handleAddClick() {
     setEditingStudent(null)
@@ -59,9 +73,9 @@ function StudentList() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h1 className="text-2xl font-semibold">Students</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <select
             value={classFilter}
             onChange={(e) => setClassFilter(e.target.value)}
@@ -80,6 +94,45 @@ function StudentList() {
             + Add Student
           </button>
         </div>
+      </div>
+
+      {/* Search box */}
+      <div className="mb-4">
+        <div className="relative max-w-md">
+          <svg
+            className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+            />
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by student name or father's name"
+            className="w-full border rounded-lg pl-10 pr-10 py-2 bg-white focus:outline-none focus:border-cyan-500"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        <p className="text-sm text-gray-500 mt-2">
+          Showing {visibleStudents.length} of {students.length} students
+        </p>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -138,7 +191,7 @@ function StudentList() {
             {visibleStudents.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-6 text-center text-gray-400">
-                  No students yet.
+                  {isFiltering ? "No students match your search." : "No students yet."}
                 </td>
               </tr>
             )}
