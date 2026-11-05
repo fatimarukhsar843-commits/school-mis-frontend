@@ -108,7 +108,7 @@ function Layout() {
   const initial = user?.name?.[0]?.toUpperCase() || "?"
 
   return (
-    <div className="flex min-h-screen relative overflow-x-hidden">
+        <div className="flex min-h-screen relative overflow-x-clip">
       {/* Watermark — fixed to the whole viewport, behind everything */}
       <div className="pointer-events-none select-none fixed inset-0 flex items-center justify-center opacity-[0.05] z-0">
         {branding.logoUrl ? (
@@ -132,7 +132,7 @@ function Layout() {
 
       {/* Sidebar: slides in on phones, always visible on bigger screens */}
       <aside
-        className={`w-64 text-white flex flex-col z-40 fixed inset-y-0 left-0 transform transition-transform duration-200 md:static md:translate-x-0 md:z-10 md:flex-shrink-0 ${
+                className={`w-64 text-white flex flex-col z-40 fixed inset-y-0 left-0 transform transition-transform duration-200 md:sticky md:top-0 md:bottom-auto md:h-screen md:self-start md:translate-x-0 md:z-10 md:flex-shrink-0 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{ backgroundColor: branding.sidebarColor }}
