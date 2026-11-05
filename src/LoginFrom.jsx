@@ -52,6 +52,25 @@ function LoginFrom() {
     ? "w-full p-3 border-b-2 border-white/70 outline-none focus:border-white bg-transparent text-white placeholder-white/70 [&:-webkit-autofill]:[-webkit-text-fill-color:#fff] [transition:background-color_9999s_ease-in-out_0s]"
     : "w-full p-3 border-b-2 border-gray-300 outline-none focus:border-cyan-500 placeholder-gray-400"
 
+  // Light box that holds the Login | Sign Up switch
+  const tabBoxClass = glass
+    ? "flex mb-6 p-1 rounded-xl bg-white/20 border border-white/40"
+    : "flex mb-6 p-1 rounded-xl bg-gray-100 border border-gray-200"
+
+  // One side of the switch: selected = light raised tile, not selected = plain text
+  function tabClass(active) {
+    const base = "w-1/2 py-2 text-lg font-medium rounded-lg transition-all"
+    if (glass) {
+      return `${base} ${active ? "bg-white/90 text-gray-800 shadow" : "text-white hover:bg-white/10"}`
+    }
+    return `${base} ${active ? "bg-white text-gray-800 shadow" : "text-gray-500 hover:text-gray-700"}`
+  }
+
+  // The big Login / Sign Up button at the bottom (light box, no color)
+  const submitClass = glass
+    ? "w-full p-3 rounded-xl text-lg font-medium bg-white/80 text-gray-800 border border-white/60 hover:bg-white transition"
+    : "w-full p-3 rounded-xl text-lg font-medium bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200 transition"
+
   function switchMode(loginMode) {
     setIsLoginMode(loginMode)
     setError("")
@@ -76,7 +95,7 @@ function LoginFrom() {
         return
       }
       try {
-        await parentSignup({ name, email, password })
+        await parentSignup({ name, email: email.trim(), password })
         setIsLoginMode(true)
         setPassword("")
         setConfirmPassword("")
@@ -92,7 +111,7 @@ function LoginFrom() {
       const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       })
 
       const data = await res.json()
@@ -166,15 +185,14 @@ function LoginFrom() {
           </h2>
         </div>
 
-        {/* tab control */}
-        <div className="relative flex h-12 mb-6 border-gray-300 rounded-full overflow-hidden">
-          <button type="button" onClick={() => switchMode(true)} className={`w-1/2 text-lg font-medium transition-all z-10 ${isLoginMode ? "text-white" : glass ? "text-white/80" : "text-black"}`}>
+        {/* Login | Sign Up switch, inside a light box */}
+        <div className={tabBoxClass}>
+          <button type="button" onClick={() => switchMode(true)} className={tabClass(isLoginMode)}>
             Login
           </button>
-          <button type="button" onClick={() => switchMode(false)} className={`w-1/2 text-lg font-medium transition-all z-10 ${!isLoginMode ? "text-white" : glass ? "text-white/80" : "text-black"}`}>
+          <button type="button" onClick={() => switchMode(false)} className={tabClass(!isLoginMode)}>
             Sign Up
           </button>
-          <div className={`absolute top-0 h-full w-1/2 rounded-full bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-200 ${isLoginMode ? "left-0" : "left-1/2"}`}> </div>
         </div>
 
         {!isLoginMode && (
@@ -203,6 +221,9 @@ function LoginFrom() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter Email"
             required
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             className={inputClass}
           />
 
@@ -212,6 +233,8 @@ function LoginFrom() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
             required
+            autoCapitalize="none"
+            autoCorrect="off"
             className={inputClass}
           />
 
@@ -222,6 +245,8 @@ function LoginFrom() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm password"
               required
+              autoCapitalize="none"
+              autoCorrect="off"
               className={inputClass}
             />
           )}
@@ -237,7 +262,7 @@ function LoginFrom() {
           {error && <p className={`text-sm text-center ${glass ? "text-red-300" : "text-red-500"}`}>{error}</p>}
           {success && <p className={`text-sm text-center ${glass ? "text-green-300" : "text-green-600"}`}>{success}</p>}
 
-          <button type="submit" className="w-full p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-200 text-white rounded-full text-lg font-medium hover:opacity-90 transition">
+          <button type="submit" className={submitClass}>
             {isLoginMode ? "Login" : "Sign Up"}
           </button>
 
