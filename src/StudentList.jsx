@@ -117,7 +117,7 @@ function StudentList() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search student"
-            className="w-full border rounded-lg pl-10 pr-10 py-2 bg-white focus:outline-none focus:border-cyan-500"
+                        className="w-full border rounded-lg pl-10 pr-10 py-1.5 text-sm bg-white focus:outline-none focus:border-cyan-500"
           />
           {search && (
             <button
