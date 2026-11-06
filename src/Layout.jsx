@@ -171,10 +171,10 @@ function Layout() {
                 to={item.path}
                 onClick={() => setMenuOpen(false)}
                 aria-current={active ? "page" : undefined}
-                className={`block px-3 py-2 rounded border-l-4 transition ${
+                                className={`block px-3 py-2 rounded transition ${
                   active
-                    ? "bg-white/25 border-white font-semibold"
-                    : "border-transparent hover:bg-white/10"
+                    ? "bg-white/25 font-semibold"
+                    : "hover:bg-white/10"
                 }`}
               >
                 {item.label}
