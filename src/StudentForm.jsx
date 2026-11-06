@@ -58,6 +58,22 @@ function StudentForm({ student, onClose }) {
     load()
   }, [])
 
+  // Pressing the Esc key closes the form (not while it is saving)
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.key === "Escape" && !saving) onClose()
+    }
+    document.addEventListener("keydown", handleKey)
+    return () => document.removeEventListener("keydown", handleKey)
+  }, [saving, onClose])
+
+  // Clicking the dark area outside the white box closes the form.
+  // (Only a click that starts on the dark area counts, so selecting text
+  // inside the form and letting go outside does not close it by mistake.)
+  function handleBackdropMouseDown(e) {
+    if (e.target === e.currentTarget && !saving) onClose()
+  }
+
   // Preview of the roll number (the server makes the final decision)
   function rollNoPreview() {
     if (isEditMode && className === student.className) return student.rollNo
@@ -119,7 +135,10 @@ function StudentForm({ student, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <div
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
+      onMouseDown={handleBackdropMouseDown}
+    >
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-semibold mb-4">
           {isEditMode ? "Edit Student" : "Add Student"}
