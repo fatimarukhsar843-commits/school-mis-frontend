@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Outlet, Link, useNavigate } from "react-router-dom"
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "./AuthContext"
 import { useBranding } from "./BrandingContext"
 import { getTeacherByLoginEmail } from "./Teachers"
@@ -55,7 +55,16 @@ function LogoIcon({ className }) {
 
 function Layout() {
   const { user, logout } = useAuth()
-  const navigate = useNavigate()
+    const navigate = useNavigate()
+  const location = useLocation()
+
+  // Is this menu item the page I am on?
+  function isActive(path) {
+    const current = location.pathname.replace(/\/+$/, "") || "/"
+    const dashboards = ["/admin", "/teacher", "/parent"]
+    if (dashboards.includes(path)) return current === path
+    return current === path || current.startsWith(path + "/")
+  }
   const { branding } = useBranding()
   const [showLogoPreview, setShowLogoPreview] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -154,16 +163,24 @@ function Layout() {
         </button>
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => setMenuOpen(false)}
-              className="block px-3 py-2 rounded hover:bg-white/10"
-            >
-              {item.label}
-            </Link>
-          ))}
+                    {menuItems.map((item) => {
+            const active = isActive(item.path)
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setMenuOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className={`block px-3 py-2 rounded border-l-4 transition ${
+                  active
+                    ? "bg-white/25 border-white font-semibold"
+                    : "border-transparent hover:bg-white/10"
+                }`}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
         </nav>
 
         {/* Account icon — bottom corner of the sidebar */}
