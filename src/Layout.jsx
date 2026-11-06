@@ -161,8 +161,8 @@ function Layout() {
           )}
           <span className="text-xl font-semibold truncate">{branding.schoolName}</span>
         </button>
-
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.35)_transparent]">
+        
                     {menuItems.map((item) => {
             const active = isActive(item.path)
             return (
